@@ -1,10 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "./Header";
+import { checkValidData } from "../utils/validate";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const fullName = useRef(null);
+  const email = useRef(null);
+  const password = useRef(null);
+
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
+  };
+  const handleSubmitClick = () => {
+    console.log(
+      //   fullName.current.value,
+      email.current.value,
+      password.current.value
+    );
+    setErrorMessage(
+      checkValidData(email.current.value, password.current.value)
+    );
   };
   return (
     <div>
@@ -16,12 +32,16 @@ const Login = () => {
         />
       </div>
 
-      <form className="w-3/12 relative  p-12 text-white bg-black my-36 mx-auto right-0 left-0 rounded-lg bg-opacity-80">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className=" w-3/12 relative  p-12 text-white bg-black  mx-auto right-0 left-0 rounded-lg bg-opacity-80"
+      >
         <h1 className="font-bold text-3xl py-4">
           {isSignInForm ? "Sign In" : "Sign Up"}
         </h1>
         {!isSignInForm && (
           <input
+            ref={fullName}
             type="text"
             name=""
             placeholder="Full name"
@@ -29,6 +49,7 @@ const Login = () => {
           />
         )}
         <input
+          ref={email}
           type="text"
           name=""
           placeholder="Email address"
@@ -36,15 +57,18 @@ const Login = () => {
         />
 
         <input
+          ref={password}
           type="password"
           name=""
           placeholder="Password"
           className="p-4 my-4 w-full bg-gray-700"
         />
+        <p className="text-red-700">{errorMessage}</p>
         <button
           type="submit"
           name=""
           className="p-4 my-6 bg-red-700 w-full rounded-lg"
+          onClick={() => handleSubmitClick()}
         >
           {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
