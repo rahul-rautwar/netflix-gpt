@@ -5,8 +5,12 @@ import { checkValidData } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { NETFLIX_BG_IMG, USER_AVATAR } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
@@ -14,16 +18,12 @@ const Login = () => {
   const fullName = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
+  const dispatch = useDispatch();
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
   };
   const handleSubmitClick = () => {
-    // console.log(
-    //   //   fullName.current.value,
-    //   email.current.value,
-    //   password.current.value
-    // );
     const message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
 
@@ -41,7 +41,26 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           // ... navigate to browsse page
-          console.log(user);
+          updateProfile(user, {
+            displayName: fullName.current.value,
+            photoURL: USER_AVATAR,
+          })
+            .then(() => {
+              // Profile updated!
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .catch((error) => {
+              // An error occurred
+              setErrorMessage(error);
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -59,8 +78,6 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          // ...  navigate to browsse page
-          console.log(user);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -73,10 +90,7 @@ const Login = () => {
     <div>
       <Header />
       <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/855ed6e2-d9f1-4afd-90da-96023ec747c3/85eb5b91-25ed-4965-ace9-ba8e4a0ead8d/IN-en-20230828-popsignuptwoweeks-perspective_alpha_website_large.jpg"
-          alt="netflix logo"
-        />
+        <img src={NETFLIX_BG_IMG} alt="netflix backgound " />
       </div>
 
       <form
