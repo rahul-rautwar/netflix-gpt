@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { API_OPTIONS } from "../utils/constants";
-import { useDispatch, useSelector } from "react-redux";
-import { addTrailerVideo } from "../utils/moviesSlice";
+import React from "react";
+import { useSelector } from "react-redux";
 
+import useMovieTrailer from "../hooks/useMovieTrailer";
+
+// fetch trailer videos and updating the store with trailer video data
 const VideoBackground = ({ movieid }) => {
-  const dispatch = useDispatch();
-  const trailerVideo = useSelector((store) => store.movies.trailerVideo);
-  const getMovieVideos = async () => {
-    const data = await fetch(
-      "https://api.themoviedb.org/3/movie/976573/videos?language=en-US",
-      API_OPTIONS
-    );
-    const json = await data.json();
-    const filteredData = json.results.filter(
-      (video) => video?.type.toLowerCase() === "trailer"
-    );
-    const trailer = filteredData?.length ? filteredData[0] : json.results[0];
-    console.log("trailer", trailer);
-    dispatch(addTrailerVideo(trailer));
-  };
-  useEffect(() => {
-    getMovieVideos();
-  }, []);
+  const trailerVideo = useSelector((store) => store.movies?.trailerVideo);
+  useMovieTrailer(movieid);
   return (
     <div>
       <iframe
